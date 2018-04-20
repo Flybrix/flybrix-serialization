@@ -1,0 +1,13 @@
+{
+  "name": "flybrix-serialization",
+  "homepage": "https://github.com/Flybrix/flybrix-serialization",
+  "description": "Tools for serialization and deserialization of messages between JS apps and the Flybrix flightboard",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
