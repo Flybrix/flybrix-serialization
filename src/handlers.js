@@ -14,6 +14,10 @@
 
     var primitiveNumericTypes = [];
 
+    var hasBit = function (mask, idx) {
+        return (mask & (1 << idx)) !== 0;
+    };
+
     var emptyNumeric = function () {
         return 0;
     };
@@ -174,7 +178,7 @@
             }
             maskHandler.encode(serializer, mask);
             children.forEach(function(child, idx) {
-                if (mask & (1 << idx)) {
+                if (hasBit(mask, idx)) {
                     child.encode(serializer, data[idx], masks && masks[idx]);
                 }
             });
@@ -182,7 +186,7 @@
         var decode = function (serializer) {
             var mask = maskHandler.decode(serializer);
             var result = children.map(function(child, idx) {
-                if (mask & (1 << idx)) {
+                if (hasBit(mask, idx)) {
                     return child.decode(serializer);
                 }
                 return null;
@@ -258,20 +262,16 @@
             } else if ('MASK' in data) {
                 mask = data.MASK;
             } else {
-                var antiMask = 0;
                 children.forEach(function (_, idx) {
                     var value = data[idx];
                     if (value !== null && value !== undefined) {
                         mask |= 1 << idx;
-                    } else {
-                        antiMask |= 1 << idx;
                     }
                 });
-                mask &= ~antiMask;
             }
             maskHandler.encode(serializer, mask);
             children.forEach(function(child, idx) {
-                if (mask & (1 << idx)) {
+                if (hasBit(mask, idx)) {
                     child.handler.encode(serializer, data[child.key], masks && masks[child.key]);
                 }
             });
@@ -280,7 +280,7 @@
             var mask = maskHandler.decode(serializer);
             var result = {};
             children.forEach(function(child, idx) {
-                if (mask & (1 << idx)) {
+                if (hasBit(mask, idx)) {
                     result[child.key] = child.decode(serializer);
                 } else {
                     result[child.key] = null;
