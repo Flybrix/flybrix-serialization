@@ -12,8 +12,6 @@
 
     var handlers = {};
 
-    var primitiveNumericTypes = [];
-
     var hasBit = function (mask, idx) {
         return (mask & (1 << idx)) !== 0;
     };
@@ -22,35 +20,7 @@
         return 0;
     };
 
-    [1, 2, 4].forEach(function (byteCount) {
-        primitiveNumericTypes.push({
-            short: 'u' + (byteCount * 8),
-            long: 'Uint' + (byteCount * 8),
-            byteCount: byteCount,
-        });
-    });
-
-    [1, 2, 4].forEach(function (byteCount) {
-        primitiveNumericTypes.push({
-            short: 'i' + (byteCount * 8),
-            long: 'Int' + (byteCount * 8),
-            byteCount: byteCount,
-        });
-    });
-
-    [4, 8].forEach(function (byteCount) {
-        primitiveNumericTypes.push({
-            short: 'f' + (byteCount * 8),
-            long: 'Float' + (byteCount * 8),
-            byteCount: byteCount,
-        });
-    });
-
-    primitiveNumericTypes.forEach(function (typeInfo) {
-        var key = typeInfo.long;
-        var keyShort = typeInfo.short;
-        var byteCount = typeInfo.byteCount;
-
+    var createNumericType = function (key, byteCount) {
         var encode = function (serializer, data) {
             serializer.dataView['set' + key](serializer.index, data, 1);
             serializer.add(byteCount);
@@ -62,8 +32,17 @@
             return data;
         };
 
-        handlers[keyShort] = new Handler(byteCount, emptyNumeric, encode, decode);
-    });
+        return new Handler(byteCount, emptyNumeric, encode, decode);
+    };
+
+    handlers.u8 = createNumericType('Uint8', 1);
+    handlers.u16 = createNumericType('Uint16', 2);
+    handlers.u32 = createNumericType('Uint32', 4);
+    handlers.i8 = createNumericType('Int8', 1);
+    handlers.i16 = createNumericType('Int16', 2);
+    handlers.i32 = createNumericType('Int32', 4);
+    handlers.f32 = createNumericType('Float32', 4);
+    handlers.f64 = createNumericType('Float64', 8);
 
     handlers.bool = new Handler(
         handlers.u8.byteCount,
@@ -99,7 +78,7 @@
     };
 
     handlers.string = function (length) {
-        var handler = handlers.array(length, handlers.u8);
+        var handler = handlers.arrayUnmasked(length, handlers.u8);
         var encode = function (serializer, data) {
             handler.encode(serializer, asciiEncode(data, length));
         };
@@ -122,27 +101,27 @@
 
     handlers.tupleUnmasked = function (children) {
         var encode = function (serializer, data, masks) {
-            children.forEach(function(child, idx) {
+            children.forEach(function (child, idx) {
                 child.encode(serializer, data[idx], masks && masks[idx]);
             });
         };
         var decode = function (serializer) {
-            return children.map(function(child) {
+            return children.map(function (child) {
                 return child.decode(serializer);
             });
         };
         var encodeFixed = function (serializer, data) {
-            children.forEach(function(child, idx) {
+            children.forEach(function (child, idx) {
                 child.encodeFixed(serializer, data[idx]);
             });
         };
         var decodeFixed = function (serializer) {
-            return children.map(function(child) {
+            return children.map(function (child) {
                 return child.decodeFixed(serializer);
             });
         };
         var empty = function () {
-            return children.map(function(child) {
+            return children.map(function (child) {
                 return child.empty();
             });
         };
@@ -177,7 +156,7 @@
                 });
             }
             maskHandler.encode(serializer, mask);
-            children.forEach(function(child, idx) {
+            children.forEach(function (child, idx) {
                 if (hasBit(mask, idx)) {
                     child.encode(serializer, data[idx], masks && masks[idx]);
                 }
@@ -185,7 +164,7 @@
         };
         var decode = function (serializer) {
             var mask = maskHandler.decode(serializer);
-            var result = children.map(function(child, idx) {
+            var result = children.map(function (child, idx) {
                 if (hasBit(mask, idx)) {
                     return child.decode(serializer);
                 }
@@ -195,19 +174,21 @@
             return mask;
         };
         var encodeFixed = function (serializer, data) {
-            children.forEach(function(child, idx) {
+            children.forEach(function (child, idx) {
                 child.encodeFixed(serializer, data[idx]);
             });
         };
         var decodeFixed = function (serializer) {
-            return children.map(function(child) {
+            return children.map(function (child) {
                 return child.decodeFixed(serializer);
             });
         };
         var empty = function () {
-            return children.map(function(child) {
+            var result = children.map(function (child) {
                 return child.empty();
             });
+            result.MASK = Math.pow(2, children.length) - 1;
+            return result;
         };
         var byteCount = children.reduce(function (accum, child) {
             return accum + child.byteCount;
@@ -217,33 +198,33 @@
 
     handlers.mapUnmasked = function (children) {
         var encode = function (serializer, data, masks) {
-            children.forEach(function(child) {
+            children.forEach(function (child) {
                 child.handler.encode(serializer, data[child.key], masks && masks[child.key]);
             });
         };
         var decode = function (serializer) {
             var result = {};
-            children.forEach(function(child) {
+            children.forEach(function (child) {
                 result[child.key] = child.handler.decode(serializer);
             });
             return result;
         };
         var encodeFixed = function (serializer, data) {
-            children.forEach(function(child) {
+            children.forEach(function (child) {
                 child.handler.encodeFixed(serializer, data[child.key]);
             });
         };
         var decodeFixed = function (serializer) {
             var result = {};
-            children.forEach(function(child) {
+            children.forEach(function (child) {
                 result[child.key] = child.handler.decodeFixed(serializer);
             });
             return result;
         };
         var empty = function () {
             var result = {};
-            children.forEach(function(child) {
-                result[child.key] = child.empty();
+            children.forEach(function (child) {
+                result[child.key] = child.handler.empty();
             });
             return result;
         };
@@ -270,7 +251,7 @@
                 });
             }
             maskHandler.encode(serializer, mask);
-            children.forEach(function(child, idx) {
+            children.forEach(function (child, idx) {
                 if (hasBit(mask, idx)) {
                     child.handler.encode(serializer, data[child.key], masks && masks[child.key]);
                 }
@@ -279,7 +260,7 @@
         var decode = function (serializer) {
             var mask = maskHandler.decode(serializer);
             var result = {};
-            children.forEach(function(child, idx) {
+            children.forEach(function (child, idx) {
                 if (hasBit(mask, idx)) {
                     result[child.key] = child.decode(serializer);
                 } else {
@@ -290,22 +271,23 @@
             return mask;
         };
         var encodeFixed = function (serializer, data) {
-            children.forEach(function(child) {
+            children.forEach(function (child) {
                 child.handler.encodeFixed(serializer, data[child.key]);
             });
         };
         var decodeFixed = function (serializer) {
             var result = {};
-            children.forEach(function(child) {
+            children.forEach(function (child) {
                 result[child.key] = child.handler.decodeFixed(serializer);
             });
             return result;
         };
         var empty = function () {
             var result = {};
-            children.forEach(function(child) {
-                result[child.key] = child.empty();
+            children.forEach(function (child) {
+                result[child.key] = child.handler.empty();
             });
+            result.MASK = Math.pow(2, children.length) - 1;
             return result;
         };
         var byteCount = children.reduce(function (accum, child) {
