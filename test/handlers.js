@@ -230,6 +230,10 @@ describe('Handlers', function () {
             var b = new this.Serializer(new DataView(data.buffer, 0));
             expect(this.handler.decodeFixed(b)).toEqual(false);
         });
+
+        it('has the correct descriptor', function () {
+            expect(this.handler.descriptor).toBe('bool');
+        });
     });
 
     describe('number', function () {
@@ -487,6 +491,17 @@ describe('Handlers', function () {
             var encoder = this.handlers.f64;
             expect(encoder.decodeFixed(b)).toEqual(1005.75);
         });
+
+        it('has the correct descriptor', function () {
+            expect(this.handlers.u8.descriptor).toBe('u8');
+            expect(this.handlers.u16.descriptor).toBe('u16');
+            expect(this.handlers.u32.descriptor).toBe('u32');
+            expect(this.handlers.i8.descriptor).toBe('i8');
+            expect(this.handlers.i16.descriptor).toBe('i16');
+            expect(this.handlers.i32.descriptor).toBe('i32');
+            expect(this.handlers.f32.descriptor).toBe('f32');
+            expect(this.handlers.f64.descriptor).toBe('f64');
+        });
     });
 
     describe('string', function () {
@@ -541,6 +556,12 @@ describe('Handlers', function () {
             var encoder = this.handlers.string(9);
             expect(encoder.decodeFixed(b)).toEqual('Abcd');
         });
+
+        it('has the correct descriptor', function () {
+            expect(this.handlers.string(12).descriptor).toBe('s12');
+            expect(this.handlers.string(3).descriptor).toBe('s3');
+            expect(this.handlers.string(9).descriptor).toBe('s9');
+        });
     });
 
     describe('map without masking', function () {
@@ -550,6 +571,10 @@ describe('Handlers', function () {
                 {key: 'b', handler: this.handlers.string(5)},
                 {key: 'c', handler: this.handlers.arrayUnmasked(4, this.handlers.u8)},
             ]);
+        });
+
+        it('has the correct descriptor', function () {
+            expect(this.handler.descriptor).toBe('{a:[/8/u8:4],b:s5,c:[u8:4]}');
         });
 
         it('encodes any data without mask field', function () {
@@ -624,6 +649,10 @@ describe('Handlers', function () {
                 {key: 'b', handler: this.handlers.string(5)},
                 {key: 'c', handler: this.handlers.arrayUnmasked(4, this.handlers.u8)},
             ], 35);
+        });
+
+        it('has the correct descriptor', function () {
+            expect(this.handler.descriptor).toBe('{/40/a:[/8/u8:4],b:s5,c:[u8:4]}');
         });
 
         it('encodes any data without mask field', function () {
@@ -704,6 +733,10 @@ describe('Handlers', function () {
             ]);
         });
 
+        it('has the correct descriptor', function () {
+            expect(this.handler.descriptor).toBe('([/8/u8:4],s5,[u8:4])');
+        });
+
         it('encodes any data without mask field', function () {
             var data = new Uint8Array(12);
             var b = new this.Serializer(new DataView(data.buffer, 0));
@@ -778,6 +811,10 @@ describe('Handlers', function () {
             ], 35);
         });
 
+        it('has the correct descriptor', function () {
+            expect(this.handler.descriptor).toBe('(/40/[/8/u8:4],s5,[u8:4])');
+        });
+
         it('encodes any data without mask field', function () {
             var data = new Uint8Array(13);
             var b = new this.Serializer(new DataView(data.buffer, 0));
@@ -848,6 +885,10 @@ describe('Handlers', function () {
         beforeEach(function () {
             this.handler = this.handlers.arrayUnmasked(
                 3, this.handlers.arrayMasked(4, this.handlers.u8, 8));
+        });
+
+        it('has the correct descriptor', function () {
+            expect(this.handler.descriptor).toBe('[[/8/u8:4]:3]');
         });
 
         it('encodes any data without mask field', function () {
@@ -922,6 +963,10 @@ describe('Handlers', function () {
         beforeEach(function () {
             this.handler = this.handlers.arrayMasked(
                 3, this.handlers.arrayMasked(4, this.handlers.u8, 8), 18);
+        });
+
+        it('has the correct descriptor', function () {
+            expect(this.handler.descriptor).toBe('[/24/[/8/u8:4]:3]');
         });
 
         it('encodes any data without mask field', function () {
