@@ -189,20 +189,6 @@ describe('Handlers', function () {
             expect(data).toEqual(new Uint8Array([0]));
         });
 
-        it('fixed encodes true', function () {
-            var data = new Uint8Array(1);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            this.handler.encodeFixed(b, true);
-            expect(data).toEqual(new Uint8Array([1]));
-        });
-
-        it('fixed encodes false', function () {
-            var data = new Uint8Array(1);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            this.handler.encodeFixed(b, false);
-            expect(data).toEqual(new Uint8Array([0]));
-        });
-
         it('has right amount of bytes', function () {
             expect(this.handler.byteCount).toBe(1);
         });
@@ -217,18 +203,6 @@ describe('Handlers', function () {
             var data = new Uint8Array([0]);
             var b = new this.Serializer(new DataView(data.buffer, 0));
             expect(this.handler.decode(b)).toEqual(false);
-        });
-
-        it('decodes fixed true', function () {
-            var data = new Uint8Array([5]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            expect(this.handler.decodeFixed(b)).toEqual(true);
-        });
-
-        it('decodes fixed false', function () {
-            var data = new Uint8Array([0]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            expect(this.handler.decodeFixed(b)).toEqual(false);
         });
 
         it('has the correct descriptor', function () {
@@ -302,71 +276,6 @@ describe('Handlers', function () {
                 [0x00, 0x00, 0x00, 0x00, 0x00, 0x6e, 0x8f, 0x40]));
         });
 
-        it('encodes fixed Uint8', function () {
-            var data = new Uint8Array(1);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.u8;
-            encoder.encodeFixed(b, 180);
-            expect(data).toEqual(new Uint8Array([180]));
-        });
-
-        it('encodes fixed Uint16', function () {
-            var data = new Uint8Array(2);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.u16;
-            encoder.encodeFixed(b, 0xF00D);
-            expect(data).toEqual(new Uint8Array([0x0D, 0xF0]));
-        });
-
-        it('encodes fixed Uint32', function () {
-            var data = new Uint8Array(4);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.u32;
-            encoder.encodeFixed(b, 0xF00DD33D);
-            expect(data).toEqual(new Uint8Array([0x3D, 0xD3, 0x0D, 0xF0]));
-        });
-
-        it('encodes fixed Int8', function () {
-            var data = new Uint8Array(1);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.i8;
-            encoder.encodeFixed(b, -100);
-            expect(data).toEqual(new Uint8Array([156]));
-        });
-
-        it('encodes fixed Int16', function () {
-            var data = new Uint8Array(2);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.i16;
-            encoder.encodeFixed(b, -10000);
-            expect(data).toEqual(new Uint8Array([240, 216]));
-        });
-
-        it('encodes fixed Int32', function () {
-            var data = new Uint8Array(4);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.i32;
-            encoder.encodeFixed(b, -1000000000);
-            expect(data).toEqual(new Uint8Array([0x00, 0x36, 0x65, 0xC4]));
-        });
-
-        it('encodes fixed Float32', function () {
-            var data = new Uint8Array(4);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.f32;
-            encoder.encodeFixed(b, 1005.75);
-            expect(data).toEqual(new Uint8Array([0x00, 0x70, 0x7b, 0x44]));
-        });
-
-        it('encodes fixed Float64', function () {
-            var data = new Uint8Array(8);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.f64;
-            encoder.encodeFixed(b, 1005.75);
-            expect(data).toEqual(new Uint8Array(
-                [0x00, 0x00, 0x00, 0x00, 0x00, 0x6e, 0x8f, 0x40]));
-        });
-
         it('has right amount of bytes', function () {
             expect(this.handlers.u8.byteCount).toBe(1);
             expect(this.handlers.u16.byteCount).toBe(2);
@@ -435,63 +344,6 @@ describe('Handlers', function () {
             expect(encoder.decode(b)).toEqual(1005.75);
         });
 
-        it('decodes fixed Uint8', function () {
-            var data = new Uint8Array([180]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.u8;
-            expect(encoder.decodeFixed(b)).toEqual(180);
-        });
-
-        it('decodes fixed Uint16', function () {
-            var data = new Uint8Array([0x0D, 0xF0]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.u16;
-            expect(encoder.decodeFixed(b)).toEqual(0xF00D);
-        });
-
-        it('decodes fixed Uint32', function () {
-            var data = new Uint8Array([0x3D, 0xD3, 0x0D, 0xF0]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.u32;
-            expect(encoder.decodeFixed(b)).toEqual(0xF00DD33D);
-        });
-
-        it('decodes fixed Int8', function () {
-            var data = new Uint8Array([156]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.i8;
-            expect(encoder.decodeFixed(b)).toEqual(-100);
-        });
-
-        it('decodes fixed Int16', function () {
-            var data = new Uint8Array([240, 216]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.i16;
-            expect(encoder.decodeFixed(b)).toEqual(-10000);
-        });
-
-        it('decodes fixed Int32', function () {
-            var data = new Uint8Array([0x00, 0x36, 0x65, 0xC4]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.i32;
-            expect(encoder.decodeFixed(b)).toEqual(-1000000000);
-        });
-
-        it('decodes fixed Float32', function () {
-            var data = new Uint8Array([0x00, 0x70, 0x7b, 0x44]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.f32;
-            expect(encoder.decodeFixed(b)).toEqual(1005.75);
-        });
-
-        it('decodes fixed Float64', function () {
-            var data = new Uint8Array(
-                [0x00, 0x00, 0x00, 0x00, 0x00, 0x6e, 0x8f, 0x40]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.f64;
-            expect(encoder.decodeFixed(b)).toEqual(1005.75);
-        });
-
         it('has the correct descriptor', function () {
             expect(this.handlers.u8.descriptor).toBe('u8');
             expect(this.handlers.u16.descriptor).toBe('u16');
@@ -522,15 +374,6 @@ describe('Handlers', function () {
             expect(data).toEqual(new Uint8Array([65, 98, 99, 48, 49, 0]));
         });
 
-        it('encodes fixed string', function () {
-            var data = new Uint8Array(9);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.string(9);
-            encoder.encodeFixed(b, 'Abcd');
-            expect(data).toEqual(
-                new Uint8Array([65, 98, 99, 100, 0, 0, 0, 0, 0]));
-        });
-
         it('has right amount of bytes', function () {
             var encoder = this.handlers.string(9);
             expect(encoder.byteCount).toBe(9);
@@ -548,13 +391,6 @@ describe('Handlers', function () {
             var b = new this.Serializer(new DataView(data.buffer, 0));
             var encoder = this.handlers.string(6);
             expect(encoder.decode(b)).toEqual('Abc01');
-        });
-
-        it('decodes fixed string', function () {
-            var data = new Uint8Array([65, 98, 99, 100, 0, 0, 0, 48, 49]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            var encoder = this.handlers.string(9);
-            expect(encoder.decodeFixed(b)).toEqual('Abcd');
         });
 
         it('has the correct descriptor', function () {
@@ -605,18 +441,6 @@ describe('Handlers', function () {
                 [3, 0, 1, 97, 98, 99, 100, 0, 4, 5, 6, 7]));
         });
 
-        it('encodes fixed', function () {
-            var data = new Uint8Array(13);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            this.handler.encodeFixed(b, {
-                a: [0, 1, 2, 3],
-                b: 'abcd',
-                c: [4, 5, 6, 7],
-            });
-            expect(data).toEqual(new Uint8Array(
-                [0, 1, 2, 3, 97, 98, 99, 100, 0, 4, 5, 6, 7]));
-        });
-
         it('has right amount of bytes', function () {
             expect(this.handler.byteCount).toBe(14);
         });
@@ -626,16 +450,6 @@ describe('Handlers', function () {
             var b = new this.Serializer(new DataView(data.buffer, 0));
             expect(this.handler.decode(b)).toEqual({
                 a: [0, 1, null, null],
-                b: 'abcd',
-                c: [4, 5, 6, 7],
-            });
-        });
-
-        it('decodes fixed', function () {
-            var data = new Uint8Array([0, 1, 2, 3, 97, 98, 99, 100, 0, 4, 5, 6, 7]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            expect(this.handler.decodeFixed(b)).toEqual({
-                a: [0, 1, 2, 3],
                 b: 'abcd',
                 c: [4, 5, 6, 7],
             });
@@ -687,18 +501,6 @@ describe('Handlers', function () {
                 [3, 0, 0, 0, 0, 3, 0, 1, 97, 98, 99, 100, 0]));
         });
 
-        it('encodes fixed', function () {
-            var data = new Uint8Array(13);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            this.handler.encodeFixed(b, {
-                a: [0, 1, 2, 3],
-                b: 'abcd',
-                c: [4, 5, 6, 7],
-            });
-            expect(data).toEqual(new Uint8Array(
-                [0, 1, 2, 3, 97, 98, 99, 100, 0, 4, 5, 6, 7]));
-        });
-
         it('has right amount of bytes', function () {
             expect(this.handler.byteCount).toBe(19);
         });
@@ -710,16 +512,6 @@ describe('Handlers', function () {
                 a: [0, 1, null, null],
                 b: 'abcd',
                 c: null,
-            });
-        });
-
-        it('decodes fixed', function () {
-            var data = new Uint8Array([0, 1, 2, 3, 97, 98, 99, 100, 0, 4, 5, 6, 7]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            expect(this.handler.decodeFixed(b)).toEqual({
-                a: [0, 1, 2, 3],
-                b: 'abcd',
-                c: [4, 5, 6, 7],
             });
         });
     });
@@ -765,18 +557,6 @@ describe('Handlers', function () {
                 [3, 0, 1, 97, 98, 99, 100, 0, 4, 5, 6, 7]));
         });
 
-        it('encodes fixed', function () {
-            var data = new Uint8Array(13);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            this.handler.encodeFixed(b, [
-                [0, 1, 2, 3],
-                'abcd',
-                [4, 5, 6, 7],
-            ]);
-            expect(data).toEqual(new Uint8Array(
-                [0, 1, 2, 3, 97, 98, 99, 100, 0, 4, 5, 6, 7]));
-        });
-
         it('has right amount of bytes', function () {
             expect(this.handler.byteCount).toBe(14);
         });
@@ -786,16 +566,6 @@ describe('Handlers', function () {
             var b = new this.Serializer(new DataView(data.buffer, 0));
             expect(this.handler.decode(b)).toEqual([
                 [0, 1, null, null],
-                'abcd',
-                [4, 5, 6, 7],
-            ]);
-        });
-
-        it('decodes fixed', function () {
-            var data = new Uint8Array([0, 1, 2, 3, 97, 98, 99, 100, 0, 4, 5, 6, 7]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            expect(this.handler.decodeFixed(b)).toEqual([
-                [0, 1, 2, 3],
                 'abcd',
                 [4, 5, 6, 7],
             ]);
@@ -844,18 +614,6 @@ describe('Handlers', function () {
                 [3, 0, 0, 0, 0, 3, 0, 1, 97, 98, 99, 100, 0]));
         });
 
-        it('encodes fixed', function () {
-            var data = new Uint8Array(13);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            this.handler.encodeFixed(b, [
-                [0, 1, 2, 3],
-                'abcd',
-                [4, 5, 6, 7],
-            ]);
-            expect(data).toEqual(new Uint8Array(
-                [0, 1, 2, 3, 97, 98, 99, 100, 0, 4, 5, 6, 7]));
-        });
-
         it('has right amount of bytes', function () {
             expect(this.handler.byteCount).toBe(19);
         });
@@ -867,16 +625,6 @@ describe('Handlers', function () {
                 [0, 1, null, null],
                 'abcd',
                 null,
-            ]);
-        });
-
-        it('decodes fixed', function () {
-            var data = new Uint8Array([0, 1, 2, 3, 97, 98, 99, 100, 0, 4, 5, 6, 7]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            expect(this.handler.decodeFixed(b)).toEqual([
-                [0, 1, 2, 3],
-                'abcd',
-                [4, 5, 6, 7],
             ]);
         });
     });
@@ -922,18 +670,6 @@ describe('Handlers', function () {
                 [3, 0, 1, 13, 4, 6, 7, 15, 8, 9, 10, 11]));
         });
 
-        it('encodes fixed', function () {
-            var data = new Uint8Array(12);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            this.handler.encodeFixed(b, [
-                [0, 1, 2, 3],
-                [4, 5, 6, 7],
-                [8, 9, 10, 11],
-            ]);
-            expect(data).toEqual(new Uint8Array(
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]));
-        });
-
         it('has right amount of bytes', function () {
             expect(this.handler.byteCount).toBe(15);
         });
@@ -944,16 +680,6 @@ describe('Handlers', function () {
             expect(this.handler.decode(b)).toEqual([
                 [0, 1, null, null],
                 [4, null, 6, 7],
-                [8, 9, 10, 11],
-            ]);
-        });
-
-        it('decodes fixed', function () {
-            var data = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            expect(this.handler.decodeFixed(b)).toEqual([
-                [0, 1, 2, 3],
-                [4, 5, 6, 7],
                 [8, 9, 10, 11],
             ]);
         });
@@ -1012,18 +738,6 @@ describe('Handlers', function () {
             expect(data).toEqual(new Uint8Array([1, 0, 0, 3, 0, 1]));
         });
 
-        it('encodes fixed', function () {
-            var data = new Uint8Array(12);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            this.handler.encodeFixed(b, [
-                [0, 1, 2, 3],
-                [4, 5, 6, 7],
-                [8, 9, 10, 11],
-            ]);
-            expect(data).toEqual(new Uint8Array(
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]));
-        });
-
         it('has right amount of bytes', function () {
             expect(this.handler.byteCount).toBe(18);
         });
@@ -1034,16 +748,6 @@ describe('Handlers', function () {
             expect(this.handler.decode(b)).toEqual([
                 [0, 1, null, null],
                 null,
-                [8, 9, 10, 11],
-            ]);
-        });
-
-        it('decodes fixed', function () {
-            var data = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
-            var b = new this.Serializer(new DataView(data.buffer, 0));
-            expect(this.handler.decodeFixed(b)).toEqual([
-                [0, 1, 2, 3],
-                [4, 5, 6, 7],
                 [8, 9, 10, 11],
             ]);
         });

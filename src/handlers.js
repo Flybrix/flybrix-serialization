@@ -5,13 +5,11 @@
         return null;
     };
 
-    function Handler(descriptor, byteCount, empty, encode, decode, encodeFixed, decodeFixed, fullMask) {
+    function Handler(descriptor, byteCount, empty, encode, decode, fullMask) {
         this.descriptor = descriptor;
         this.byteCount = byteCount;
         this.encode = encode;
         this.decode = decode;
-        this.encodeFixed = encodeFixed || encode;
-        this.decodeFixed = decodeFixed || decode;
         this.empty = empty;
         this.fullMask = fullMask || nullMask;
         this.isBasic = false;
@@ -136,29 +134,10 @@
                 return child.decode(serializer);
             });
         };
-        var encodeFixed = function (serializer, data) {
-            children.forEach(function (child, idx) {
-                child.encodeFixed(serializer, data[idx]);
-            });
-        };
-        var decodeFixed = function (serializer) {
-            return children.map(function (child) {
-                return child.decodeFixed(serializer);
-            });
-        };
         var empty = function () {
             return children.map(function (child) {
                 return child.empty();
             });
-        };
-        var fullMask = function () {
-            var result = children.map(function (child) {
-                return child.fullMask();
-            });
-            if (result.every(isNull)) {
-                return null;
-            }
-            return result;
         };
         var fullMask = function () {
             var nonNullChild = false;
@@ -182,7 +161,7 @@
             return child.descriptor;
         });
         var descriptor = '(' + childDescriptors.join(',') + ')';
-        return new Handler(descriptor, byteCount, empty, encode, decode, encodeFixed, decodeFixed, fullMask);
+        return new Handler(descriptor, byteCount, empty, encode, decode, fullMask);
     };
 
     handlers.arrayMasked = function (length, handler, maskBitCount) {
@@ -238,16 +217,6 @@
             });
             return result;
         };
-        var encodeFixed = function (serializer, data) {
-            children.forEach(function (child, idx) {
-                child.encodeFixed(serializer, data[idx]);
-            });
-        };
-        var decodeFixed = function (serializer) {
-            return children.map(function (child) {
-                return child.decodeFixed(serializer);
-            });
-        };
         var empty = function () {
             var result = children.map(function (child) {
                 return child.empty();
@@ -274,7 +243,7 @@
             return child.descriptor;
         });
         var descriptor = '(/' + (maskBytes * 8) + '/' + childDescriptors.join(',') + ')';
-        return new Handler(descriptor, byteCount, empty, encode, decode, encodeFixed, decodeFixed, fullMask);
+        return new Handler(descriptor, byteCount, empty, encode, decode, fullMask);
     };
 
     handlers.mapUnmasked = function (children) {
@@ -290,18 +259,6 @@
             var result = {};
             children.forEach(function (child) {
                 result[child.key] = child.handler.decode(serializer);
-            });
-            return result;
-        };
-        var encodeFixed = function (serializer, data) {
-            children.forEach(function (child) {
-                child.handler.encodeFixed(serializer, data[child.key]);
-            });
-        };
-        var decodeFixed = function (serializer) {
-            var result = {};
-            children.forEach(function (child) {
-                result[child.key] = child.handler.decodeFixed(serializer);
             });
             return result;
         };
@@ -334,7 +291,7 @@
             return child.key + ':' + child.handler.descriptor;
         });
         var descriptor = '{' + childDescriptors.join(',') + '}';
-        return new Handler(descriptor, byteCount, empty, encode, decode, encodeFixed, decodeFixed, fullMask);
+        return new Handler(descriptor, byteCount, empty, encode, decode, fullMask);
     };
 
     handlers.mapMasked = function (children, maskBitCount) {
@@ -382,18 +339,6 @@
             });
             return result;
         };
-        var encodeFixed = function (serializer, data) {
-            children.forEach(function (child) {
-                child.handler.encodeFixed(serializer, data[child.key]);
-            });
-        };
-        var decodeFixed = function (serializer) {
-            var result = {};
-            children.forEach(function (child) {
-                result[child.key] = child.handler.decodeFixed(serializer);
-            });
-            return result;
-        };
         var empty = function () {
             var result = {};
             children.forEach(function (child) {
@@ -421,7 +366,7 @@
             return child.key + ':' + child.handler.descriptor;
         });
         var descriptor = '{/' + (maskBytes * 8) + '/' + childDescriptors.join(',') + '}';
-        return new Handler(descriptor, byteCount, empty, encode, decode, encodeFixed, decodeFixed, fullMask);
+        return new Handler(descriptor, byteCount, empty, encode, decode, fullMask);
     };
 
     if (!global.FlybrixSerialization) {
