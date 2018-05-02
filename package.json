@@ -1,7 +1,10 @@
 {
   "name": "flybrix-serialization",
+  "angularModuleName": "flybrixSerialization",
   "description": "Tools for serialization and deserialization of messages between JS apps and the Flybrix flightboard",
   "scripts": {
+    "build": "gulp build",
+    "watch": "gulp watch"
   },
   "repository": {
     "type": "git",
@@ -12,6 +15,12 @@
   },
   "homepage": "https://github.com/Flybrix/flybrix-serialization#readme",
   "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-angular-templatecache": "^2.2.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-plumber": "^1.2.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.0",
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.2",
     "karma-chrome-launcher": "^2.2.0",
