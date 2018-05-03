@@ -17,6 +17,14 @@ describe('Handlers', function () {
             expect(this.handlers.f64.empty()).toEqual(0);
         });
 
+        it('is true for void', function () {
+            expect(this.handlers.void.empty()).toEqual(true);
+        });
+
+        it('is empty string for s', function () {
+            expect(this.handlers.s.empty()).toEqual('');
+        });
+
         it('is empty string for string', function () {
             expect(this.handlers.string(5).empty()).toEqual('');
         });
@@ -78,7 +86,15 @@ describe('Handlers', function () {
             expect(this.handlers.f64.fullMask()).toEqual(null);
         });
 
-        it('is null string for string', function () {
+        it('is null for s', function () {
+            expect(this.handlers.s.fullMask()).toEqual(null);
+        });
+
+        it('is null for void', function () {
+            expect(this.handlers.void.fullMask()).toEqual(null);
+        });
+
+        it('is null for string', function () {
             expect(this.handlers.string(5).fullMask()).toEqual(null);
         });
 
@@ -207,6 +223,33 @@ describe('Handlers', function () {
 
         it('has the correct descriptor', function () {
             expect(this.handler.descriptor).toBe('bool');
+        });
+    });
+
+    describe('void', function () {
+        beforeEach(function () {
+            this.handler = this.handlers.void;
+        });
+
+        it('encodes anything', function () {
+            var data = new Uint8Array([3, 5, 2]);
+            var b = new this.Serializer(new DataView(data.buffer, 0));
+            this.handler.encode(b, [2, 1, 4]);
+            expect(data).toEqual(data);
+        });
+
+        it('has right amount of bytes', function () {
+            expect(this.handler.byteCount).toBe(0);
+        });
+
+        it('decodes anything', function () {
+            var data = new Uint8Array([3, 5, 2]);
+            var b = new this.Serializer(new DataView(data.buffer, 0));
+            expect(this.handler.decode(b)).toEqual(true);
+        });
+
+        it('has the correct descriptor', function () {
+            expect(this.handler.descriptor).toBe('void');
         });
     });
 

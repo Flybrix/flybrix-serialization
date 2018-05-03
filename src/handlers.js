@@ -75,6 +75,19 @@
         });
     handlers.bool.isBasic = true;
 
+    handlers.void = new Handler(
+        'void',
+        0,
+        function () {
+            return true;
+        },
+        function (serializer, data) {
+        },
+        function () {
+            return true;
+        });
+    handlers.void.isBasic = true;
+
     var asciiEncode = function (name, length) {
         var response = new Uint8Array(length);
         name.split('').forEach(function (c, idx) {
