@@ -400,6 +400,52 @@ describe('Handlers', function () {
         });
     });
 
+    describe('s', function () {
+        it('encodes short string', function () {
+            var data = new Uint8Array([1, 1, 1, 1, 1, 1, 1, 1, 1]);
+            var b = new this.Serializer(new DataView(data.buffer, 0));
+            this.handlers.s.encode(b, 'Abcd');
+            expect(data).toEqual(
+                new Uint8Array([65, 98, 99, 100, 0, 1, 1, 1, 1]));
+        });
+
+        it('encodes exactly long string', function () {
+            var data = new Uint8Array(9);
+            var b = new this.Serializer(new DataView(data.buffer, 0));
+            this.handlers.s.encode(b, '012345678');
+            expect(data).toEqual(
+                new Uint8Array([48, 49, 50, 51, 52, 53, 54, 55, 56]));
+        });
+
+        it('encodes too long string', function () {
+            var data = new Uint8Array(9);
+            var b = new this.Serializer(new DataView(data.buffer, 0));
+            this.handlers.s.encode(b, '01234567890123456789');
+            expect(data).toEqual(
+                new Uint8Array([48, 49, 50, 51, 52, 53, 54, 55, 56]));
+        });
+
+        it('has 0 bytes in byte count', function () {
+            expect(this.handlers.s.byteCount).toBe(0);
+        });
+
+        it('decodes short string', function () {
+            var data = new Uint8Array([65, 98, 99, 100, 0, 0, 0, 48, 49]);
+            var b = new this.Serializer(new DataView(data.buffer, 0));
+            expect(this.handlers.s.decode(b)).toEqual('Abcd');
+        });
+
+        it('decodes unterminated string by trimming the end', function () {
+            var data = new Uint8Array([65, 98, 99, 48, 49, 50]);
+            var b = new this.Serializer(new DataView(data.buffer, 0));
+            expect(this.handlers.s.decode(b)).toEqual('Abc012');
+        });
+
+        it('has the correct descriptor', function () {
+            expect(this.handlers.s.descriptor).toBe('s');
+        });
+    });
+
     describe('map without masking', function () {
         beforeEach(function () {
             this.handler = this.handlers.mapUnmasked([

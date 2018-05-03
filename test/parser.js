@@ -206,6 +206,7 @@ describe('Parser', function () {
                 'Configuration = {/16/' +
                 '  version: Version,' +
                 '  magnetometerBias: Vector3,' +
+                '  name: s,' +
                 '  ledPatterns: [// Led : 16]' +
                 '};' +
                 'Commands = {/32/' +
@@ -235,8 +236,8 @@ describe('Parser', function () {
             expect(handlers.Vector3.descriptor).toBe('{x:f32,y:f32,z:f32}');
             expect(handlers.Response.descriptor).toBe('{requests:u32,successful:u32}');
             expect(handlers.Led.descriptor).toBe('{color1:{red:u8,green:u8,blue:u8},color2:{red:u8,green:u8,blue:u8},pattern:u8}');
-            expect(handlers.Configuration.descriptor).toBe('{/16/version:{major:u8,minor:u8,patch:u8},magnetometerBias:{x:f32,y:f32,z:f32},ledPatterns:[/16/{color1:{red:u8,green:u8,blue:u8},color2:{red:u8,green:u8,blue:u8},pattern:u8}:16]}');
-            expect(handlers.Commands.descriptor).toBe('{/32/setConfig:{/16/version:{major:u8,minor:u8,patch:u8},magnetometerBias:{x:f32,y:f32,z:f32},ledPatterns:[/16/{color1:{red:u8,green:u8,blue:u8},color2:{red:u8,green:u8,blue:u8},pattern:u8}:16]},getConfig:{mainMask:u16,ledMask:u16}}');
+            expect(handlers.Configuration.descriptor).toBe('{/16/version:{major:u8,minor:u8,patch:u8},magnetometerBias:{x:f32,y:f32,z:f32},name:s,ledPatterns:[/16/{color1:{red:u8,green:u8,blue:u8},color2:{red:u8,green:u8,blue:u8},pattern:u8}:16]}');
+            expect(handlers.Commands.descriptor).toBe('{/32/setConfig:{/16/version:{major:u8,minor:u8,patch:u8},magnetometerBias:{x:f32,y:f32,z:f32},name:s,ledPatterns:[/16/{color1:{red:u8,green:u8,blue:u8},color2:{red:u8,green:u8,blue:u8},pattern:u8}:16]},getConfig:{mainMask:u16,ledMask:u16}}');
         });
     });
 });

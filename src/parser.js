@@ -77,15 +77,15 @@
         var children;
         switch (this.category) {
             case TypeCategories.NAMED:
-                if (props[0] === 's') {
-                    var length = props.substring(1);
-                    if (numericTest.test(length)) {
-                        handler = handlers.string(parseInt(length));
-                    }
-                } else if (props in handlers) {
+                if (props in handlers) {
                     handler = handlers[props];
                     if (!handler.isBasic) {
                         handler = null;
+                    }
+                } else if (props[0] === 's') {
+                    var length = props.substring(1);
+                    if (numericTest.test(length)) {
+                        handler = handlers.string(parseInt(length));
                     }
                 } else if (props in library) {
                     handler = library[props];

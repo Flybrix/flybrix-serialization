@@ -110,6 +110,35 @@
         return new Handler('s' + length, length, empty, encode, decode);
     };
 
+    handlers.s = new Handler(
+        's',
+        0,
+        function () {
+            return '';
+        },
+        function (serializer, data) {
+            var byteCount = Math.min(data.length, serializer.dataView.byteLength - serializer.index);
+            for (var idx = 0; idx < byteCount; ++idx) {
+                handlers.u8.encode(serializer, data.charCodeAt(idx));
+            }
+            if (serializer.index < serializer.dataView.byteLength) {
+                handlers.u8.encode(serializer, 0);
+            }
+        },
+        function (serializer) {
+            var response = '';
+            var byteCount = serializer.dataView.byteLength - serializer.index;
+            while (byteCount-- > 0) {
+                var charCode = handlers.u8.decode(serializer);
+                if (!charCode) {
+                    return response;
+                }
+                response += String.fromCharCode(charCode);
+            }
+            return response;
+        });
+    handlers.s.isBasic = true;
+
     handlers.arrayUnmasked = function (length, handler) {
         var children = [];
         for (var idx = 0; idx < length; ++idx) {
