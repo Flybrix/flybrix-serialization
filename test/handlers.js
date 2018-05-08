@@ -600,7 +600,6 @@ describe('Handlers', function () {
             expect(this.handler.decode(b)).toEqual({
                 a: [0, 1, null, null],
                 b: 'abcd',
-                c: null,
             });
         });
     });

@@ -387,8 +387,6 @@
             children.forEach(function (child, idx) {
                 if (hasBit(mask, idx)) {
                     result[child.key] = child.handler.decode(serializer);
-                } else {
-                    result[child.key] = null;
                 }
             });
             return result;
