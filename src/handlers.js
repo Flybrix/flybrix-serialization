@@ -9,7 +9,11 @@
         return [];
     };
 
-    function Handler(descriptor, byteCount, empty, encode, decode, fullMask, maskArray) {
+    var defaultIsNull = function (val) {
+        return val === null || val === undefined;
+    };
+
+    function Handler(descriptor, byteCount, empty, encode, decode, fullMask, maskArray, isNull) {
         this.descriptor = descriptor;
         this.byteCount = byteCount;
         this.encode = encode;
@@ -17,6 +21,7 @@
         this.empty = empty;
         this.fullMask = fullMask || nullMask;
         this.maskArray = maskArray || nullMaskArray;
+        this.isNull = isNull || defaultIsNull;
     }
 
     var handlers = {};
@@ -89,6 +94,11 @@
         },
         function () {
             return true;
+        },
+        null,
+        null,
+        function (val) {
+            return !val;
         });
     handlers.void.isBasic = true;
 
@@ -236,12 +246,12 @@
             if (masks && ('MASK' in masks)) {
                 extraMask = masks.MASK;
             }
-            children.forEach(function (_, idx) {
+            children.forEach(function (child, idx) {
                 var value = data[idx];
                 if (extraMask && !extraMask[idx]) {
                     return;
                 }
-                if (value !== null && value !== undefined) {
+                if (!child.isNull(value)) {
                     mask[Math.floor(idx / 8)] |= 1 << (idx % 8);
                 }
             });
@@ -364,7 +374,7 @@
                 if (extraMask && !extraMask[child.key]) {
                     return;
                 }
-                if (value !== null && value !== undefined) {
+                if (!child.handler.isNull(value)) {
                     mask[Math.floor(idx / 8)] |= 1 << (idx % 8);
                 }
             });
