@@ -428,7 +428,16 @@
             return child.key + ':' + child.handler.descriptor;
         });
         var descriptor = '{/' + (maskBytes * 8) + '/' + childDescriptors.join(',') + '}';
-        return new Handler(descriptor, byteCount, empty, encode, decode, fullMask, maskArray);
+        var handler = new Handler(descriptor, byteCount, empty, encode, decode, fullMask, maskArray);
+        handler.maskedBytes = function (fields) {
+            return children.reduce(function (accum, child) {
+                if (!fields[child.key]) {
+                    return accum;
+                }
+                return accum + child.handler.byteCount;
+            }, maskBytes);
+        };
+        return handler;
     };
 
     if (!global.FlybrixSerialization) {

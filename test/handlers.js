@@ -602,6 +602,18 @@ describe('Handlers', function () {
                 b: 'abcd',
             });
         });
+
+        it('produces right numbers for masked bytes', function () {
+            expect(this.handler.maskedBytes({})).toEqual(5);
+            expect(this.handler.maskedBytes({a: true, b: true, c: true})).toEqual(19);
+            expect(this.handler.maskedBytes({a: true, b: true, c: false})).toEqual(15);
+            expect(this.handler.maskedBytes({a: true, b: false, c: true})).toEqual(14);
+            expect(this.handler.maskedBytes({a: true, b: false, c: false})).toEqual(10);
+            expect(this.handler.maskedBytes({a: false, b: true, c: true})).toEqual(14);
+            expect(this.handler.maskedBytes({a: false, b: true, c: false})).toEqual(10);
+            expect(this.handler.maskedBytes({a: false, b: false, c: true})).toEqual(9);
+            expect(this.handler.maskedBytes({a: false, b: false, c: false})).toEqual(5);
+        });
     });
 
     describe('tuple without masking', function () {
